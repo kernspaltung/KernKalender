@@ -25,6 +25,8 @@
 .text-right {
   text-align: right; }
 
+.calendar-view .weekday-header, .calendar-view .day {
+  padding: 15px; }
 .calendar-view .day {
   border: 1px solid black;
   padding: 5px;

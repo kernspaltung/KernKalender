@@ -43,11 +43,12 @@ $spacing: 15px;
 
 .calendar-view {
 
-   div {
-      padding: $spacing;
-   }
    .day,.weekday-header {
       @extend .seventh;
+   }
+
+   .weekday-header, .day {
+      padding: $spacing;
    }
    .day {
       border:1px solid black; padding:5px; text-align:center; font-size:14px;
