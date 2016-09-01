@@ -1,17 +1,40 @@
+.f-l, .seventh, .calendar-view .day, .calendar-view .weekday-header, .quarter, .eight, .three-quarters {
+  float: left; }
+
+.d-i-b, .seventh, .calendar-view .day, .calendar-view .weekday-header, .quarter, .eight, .three-quarters {
+  display: inline-block; }
+
 .seventh, .calendar-view .day, .calendar-view .weekday-header {
-  width: 14.2%;
-  height: 80px;
-  float: left;
-  display: inline-block;
+  width: 14.2%; }
+
+.quarter {
+  width: 25%; }
+
+.eight {
+  width: 12.5%; }
+
+.three-quarters {
+  width: 75%; }
+
+.text-left {
+  text-align: left; }
+
+.text-center {
+  text-align: center; }
+
+.text-right {
+  text-align: right; }
+
+.calendar-view .day {
   border: 1px solid black;
   padding: 5px;
   text-align: center;
-  font-size: 14px; }
-
-.calendar-view .day.today {
-  background-color: #222;
-  color: #fff; }
-.calendar-view .day.full {
-  cursor: pointer; }
+  font-size: 14px;
+  height: 80px; }
+  .calendar-view .day.today {
+    background-color: #222;
+    color: #fff; }
+  .calendar-view .day.full {
+    cursor: pointer; }
 
 /*# sourceMappingURL=calendar.css.map */

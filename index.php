@@ -27,7 +27,7 @@ class Calendar {
       $year    = strftime( "%G", $date );
 
       ?>
-      <nav id="calendar " class="calendar w_100 h_100">
+      <section id="calendar " class="calendar w_100 h_100">
 
          <header>
 
@@ -43,6 +43,20 @@ class Calendar {
 
          <section id="calendar-view" class="calendar-view">
             <header>
+
+               <nav>
+                  <div class="arrow-previous eight text-left">
+                     previous
+                  </div>
+                  <div class="three-quarters text-center">
+                     <h2>
+                        <?php echo $monthName; ?>
+                     </h2>
+                  </div>
+                  <div class="arrow-next eight text-right">
+                     next
+                  </div>
+               </nav>
 
             </header>
             <ul>
@@ -101,7 +115,7 @@ class Calendar {
             </ul>
          </section>
 
-      </nav>
+      </section>
       <?php
    }
 

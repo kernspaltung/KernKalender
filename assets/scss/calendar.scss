@@ -1,9 +1,42 @@
-.seventh {
-   width: 14.2%;
-   height: 80px;
+.f-l {
    float: left;
+}
+
+.d-i-b {
    display: inline-block;
-   border:1px solid black; padding:5px; text-align:center; font-size:14px;
+}
+.seventh {
+   @extend .f-l;
+   @extend .d-i-b;
+   width: 14.2%;
+}
+.quarter {
+   @extend .f-l;
+   @extend .d-i-b;
+   width: 25%;
+}
+.eight {
+   @extend .f-l;
+   @extend .d-i-b;
+   width: 12.5%;
+}
+.three-quarters {
+   @extend .f-l;
+   @extend .d-i-b;
+   width: 75%;
+}
+
+
+.text-left {
+   text-align: left;
+}
+
+.text-center {
+   text-align: center;
+}
+
+.text-right {
+   text-align: right;
 }
 
 .calendar-view {
@@ -11,6 +44,9 @@
       @extend .seventh;
    }
    .day {
+      border:1px solid black; padding:5px; text-align:center; font-size:14px;
+
+      height: 80px;
 
       &.today {
          background-color: #222;
