@@ -18,6 +18,7 @@ class Calendar {
 
       $view = "month";
 
+      $week_day_initials = ["l", "m", "m", "j", "v", "s", "d" ];
 
       $date = strtotime( "today" ); //$month . "/" . $day . "/" . $year );
       $monthName = strftime( "%B", $date );
@@ -56,6 +57,16 @@ class Calendar {
                   <div class="arrow-next eight text-right">
                      next
                   </div>
+               </nav>
+
+               <nav class="week-days">
+                  <?php for ($i=0; $i < 7; $i++) {
+                     ?>
+                     <div class="seventh text-center">
+                        <?php echo $week_day_initials[$i]; ?>
+                     </div>
+                     <?php
+                  } ?>
                </nav>
 
             </header>
