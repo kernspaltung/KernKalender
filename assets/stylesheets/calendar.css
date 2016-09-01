@@ -28,7 +28,7 @@
 .calendar-view .weekday-header, .calendar-view .day {
   padding: 15px; }
 .calendar-view .day {
-  border: 1px solid black;
+  border: 1px solid #ccc;
   padding: 5px;
   text-align: center;
   font-size: 14px;
@@ -40,6 +40,8 @@
   .calendar-view .day.full {
     cursor: pointer;
     background-color: #fa0; }
+  .calendar-view .day.invisible {
+    border: none; }
   .calendar-view .day .day-number {
     padding: 7.5px !important;
     text-align: left;

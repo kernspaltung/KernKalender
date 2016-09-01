@@ -52,7 +52,8 @@ $color_accent: #fa0;
       padding: $spacing;
    }
    .day {
-      border:1px solid black; padding:5px; text-align:center; font-size:14px;
+      border:1px solid #ccc;
+      padding:5px; text-align:center; font-size:14px;
 
       height: 80px;
 
@@ -64,6 +65,9 @@ $color_accent: #fa0;
       &.full {
          cursor: pointer;
          background-color: $color_accent;
+      }
+      &.invisible {
+         border: none;
       }
       .day-number {
          padding: $spacing / 2 !important;

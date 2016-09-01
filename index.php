@@ -31,9 +31,9 @@ class KernKalender {
       date_default_timezone_set('America/Mexico_City');
 
       function add_query_vars_filter( $vars ){
-       $vars[] = "d";
-      //  $vars[] = "m";
-      //  $vars[] = "y";
+       $vars[] = "dd";
+       $vars[] = "mm";
+       $vars[] = "yy";
        return $vars;
       }
       add_filter( 'query_vars', 'add_query_vars_filter' );
@@ -87,7 +87,7 @@ class KernKalender {
             <small>
                <?php
                $this->formatter->setPattern("EEEE d 'de' MMMM', 'yyyy");
-               echo $this->formatter->format( $this->date );
+               echo "<b>hoy:</b> " . $this->formatter->format( $this->today['date'] );
                ?>
             </small>
          </header>
@@ -127,8 +127,9 @@ class KernKalender {
                <div class="three-quarters text-center">
                   <h2>
                      <?php
+
                      $this->formatter->setPattern("MMMM");
-                     echo $this->formatter->format( $this->date );
+                      echo $this->formatter->format( $this->date );
                      ?>
                   </h2>
                </div>
@@ -161,7 +162,7 @@ class KernKalender {
 
             for ($i=1; $i <= $num_day1 - 1; $i++) {
                ?>
-               <div class="weekday empty button disabled" style="">
+               <div class="day invisible" style="">
                </div>
                <?php
             }
@@ -169,17 +170,20 @@ class KernKalender {
 
             for ($i=1; $i <= $days_in_month; $i++) {
                $date = strtotime( $m . "/" . $d . "/" . $y );
-               $name_week_day = strftime("%A", $date );
                // $date = strtolower($date);
-
                $q = $this->get_date_posts_query( $i, $m, $y );
-
                $full = $q->post_count > 0;
 
-               if ( $full ) {
-                  $this->formatter->setPattern("dd'-'MM'-'yyyy");
+               // $full = 1;//$q->post_count > 0;
 
-                  $current_uri = add_query_arg( 'd', $this->formatter->format( $date ) );
+               if ( $full ) {
+                  $params = array();
+
+                  $params['dd'] = $i;
+                  $params['mm'] = $m;
+                  $params['yy'] = $y;
+
+                  $current_uri = add_query_arg( $params );
 
                   $link = $current_uri;
 
@@ -189,7 +193,7 @@ class KernKalender {
 
 
                ?>
-               <div class="day button enabled <?php echo $i==$d ? ' today ' : ''; ?> <?php echo $full ? 'full' : 'empty'; ?>" data-posts="<?php echo json_encode($post_ids); ?>">
+               <div class="day button enabled <?php #  echo $i==$d ? ' today ' : ''; ?> <?php echo $full ? 'full' : 'empty'; ?>" data-posts="<?php echo json_encode($post_ids); ?>">
                   <?php echo $full ? '<a href="'.$link.'">' : ''; ?>
                   <sup class="day-number">
                      <?php echo $i; ?>
@@ -296,7 +300,6 @@ class KernKalender {
 
 
    public function get_date_posts_query( $d, $m, $y ) {
-
       $args = array(
          'date_query' => array(
       		array(
@@ -318,11 +321,32 @@ class KernKalender {
    public function start_calendar() {
 
       $args = NULL;
-      $d = get_query_var('d');
-      if( $d != "" ) {
+      $d = get_query_var('dd');
+      $m = get_query_var('mm');
+      $y = get_query_var('yy');
 
-         $date = date_parse_from_format('j-m-Y', $d);
 
+      $view = "month";
+
+      if( $d == "" && $m != "" && $y != "" ) {
+
+         $this->day     = 1;
+         $this->month   = $m;
+         $this->year    = $y;
+
+         $this->date    = date_create_from_format(
+            'j-n-Y',
+            $this->day . "-" .
+            $this->month . "-" .
+            $this->year
+         );
+
+         $view = "month";
+
+      }
+      if( $d != NULL && $m != NULL && $y != NULL ) {
+
+         $date = date_parse_from_format('j-m-Y', $d . "-" . $m . "-" . $y );
 
          if( $date ) {
 
@@ -330,43 +354,35 @@ class KernKalender {
             $this->month   = $date['month'];
             $this->year    = $date['year'];
             $this->date    = $date;
-
             $view = "day";
 
 
-            $args = array(
-               'view' => $view,
-               'day' => $this->day,
-               'month' => $this->month,
-               'year' => $this->year,
-            );
          }
-      } else {
 
-         $this->day     = strftime( "%e", $this->today['day'] );
-         $this->month   = strftime( "%m", $this->today['month'] );
-         $this->year    = strftime( "%G", $this->today['year'] );
+
+      }
+      if( ! strcmp($d,"") && ! strcmp($m,"") && ! strcmp($y,"")  ) {
+
          $this->date    = $this->today['date'];
 
+         $this->day     = $this->today['date']->format('j');
+         $this->month   = $this->today['date']->format('n');
+         $this->year    = $this->today['date']->format('y');
+
          $view = "month";
-
-         $args = array(
-            'view' => "month",
-            'day' => 26,
-            'month' => 8,
-            'year' => 2016
-         );
       }
-
-
+      $args = array(
+         'view' => $view,
+         'day' => $this->day,
+         'month' => $this->month,
+         'year' => $this->year
+      );
 
 
 
          $this -> load_date( $args );
 
-
    }
-
 }
 
 
