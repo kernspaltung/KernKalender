@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: KernKalendar
+Plugin Name: KernKalender
 Author: kernspaltung!
 Description: Flexible Calendar for WordPress developers. Features API and with automatic view rendering and shortcodes for dummies
 */
