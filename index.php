@@ -32,6 +32,8 @@ class Calendar {
    public static function load_assets() {
       wp_enqueue_style("calendar", plugin_dir_url( __FILE__ ) . "/assets/stylesheets/calendar.css" );
    }
+
+
    public function load_view( $args ) {
 
       if( is_array($args) ) {
@@ -159,10 +161,21 @@ class Calendar {
 
                $q = $this->get_date_posts_query( $i, $this->month, $this->year );
 
-               $post_ids = wp_list_pluck( $q->posts, 'ID' )
+               $full = $q->post_count > 0;
+
+               if ( $full ) {
+
+                  $current_uri = add_query_arg( 'day', $i . '-' . $this->month . '-' . $this->year );
+                  $link = $current_uri;
+
+               }
+
+               $post_ids = wp_list_pluck( $q->posts, 'ID' );
+
 
                ?>
-               <div class="day button enabled <?php echo $i==$this->day ? ' today ' : ''; ?> <?php echo $q->post_count > 0 ? 'full' : 'empty'; ?>" data-posts="<?php echo json_encode($post_ids); ?>">
+               <div class="day button enabled <?php echo $i==$this->day ? ' today ' : ''; ?> <?php echo $full ? 'full' : 'empty'; ?>" data-posts="<?php echo json_encode($post_ids); ?>">
+                  <?php echo $full ? '<a href="'.$link.'">' : ''; ?>
                   <sup class="day-number">
                      <?php echo $i; ?>
                   </sup>
@@ -180,6 +193,7 @@ class Calendar {
                      }
                      ?>
                   </div>
+                  <?php echo $full ? '</a>' : ''; ?>
                </div>
                <?php
             }
@@ -280,19 +294,21 @@ class Calendar {
 
    public function start_calendar() {
 
-         $args = array(
-            'view'=>'day',
-            'day'=>'26',
-            'month'=>'8',
-            'year'=>'2016',
-         );
-         //
+         $view = get_query_var('day');
+         var_dump( $view );
          // $args = array(
-         //    'view'=>'month',
-         //    'day'=>'20',
+         //    'view'=>'day',
+         //    'day'=>'26',
          //    'month'=>'8',
          //    'year'=>'2016',
          // );
+         //
+         $args = array(
+            'view'=>'month',
+            'day'=>'20',
+            'month'=>'8',
+            'year'=>'2016',
+         );
 
 
          $this->load_view($args);
@@ -307,10 +323,21 @@ class Calendar {
 add_action('init', 'calendar_init');
 
 function calendar_init() {
+
    $calendar = new Calendar();
 
 
    add_shortcode( 'calendar', array( $calendar,'start_calendar'));
+
+
+
 }
+
+//
+// function add_query_vars_filter( $vars ){
+//  $vars[] = "day";
+//  return $vars;
+// }
+// add_filter( 'query_vars', 'add_query_vars_filter' );
 
 ?>
