@@ -14,7 +14,7 @@ class Calendar {
    public static function load_assets() {
       wp_enqueue_style("calendar", plugin_dir_url( __FILE__ ) . "/assets/stylesheets/calendar.css" );
    }
-   public static function do_calendar() {
+   public function do_calendar() {
 
       $view = "month";
 
@@ -68,9 +68,30 @@ class Calendar {
                   $date = strtotime( $date );
                   $name_week_day = $date = strftime("%A", $date );
                   $date = strtolower($date);
+
+                  $q = $this->get_date_posts_query( $i, $month, $year );
+
+                  $post_ids = wp_list_pluck( $q->posts, 'ID' )
+
                   ?>
-                  <div class="weekday empty button enabled <?php echo $i==$day ? ' today ' : ''; ?>" style="">
-                     <?php echo $i; ?>
+                  <div class="day button enabled <?php echo $i==$day ? ' today ' : ''; ?> <?php echo $q->post_count > 0 ? 'full' : 'empty'; ?>" data-posts="<?php echo json_encode($post_ids); ?>">
+                     <div class="day-number">
+                        <?php echo $i; ?>
+                     </div>
+                     <div class="day-posts">
+                        <?php
+                        if( $q->post_count > 0 ) {
+
+                        ?>
+                        (
+                           <span class="post-count">
+                              <?php echo $q->post_count; ?>
+                           </span>
+                        )
+                        <?php
+                        }
+                        ?>
+                     </div>
                   </div>
                   <?php
                }
@@ -82,6 +103,22 @@ class Calendar {
 
       </nav>
       <?php
+   }
+
+   public function get_date_posts_query( $d, $m, $y ) {
+
+      $args = array(
+         'date_query' => array(
+      		array(
+      			'year'  => $y,
+      			'month' => $m,
+      			'day'   => $d,
+      		),
+      	),
+      );
+      $query = new WP_Query( $args );
+
+      return $query;
    }
 
 }
