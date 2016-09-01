@@ -1,4 +1,5 @@
 $spacing: 15px;
+$color_accent: #fa0;
 
 .f-l {
    float: left;
@@ -55,12 +56,22 @@ $spacing: 15px;
 
       height: 80px;
 
+      position: relative;
       &.today {
          background-color: #222;
          color: #fff;
       }
       &.full {
          cursor: pointer;
+         background-color: $color_accent;
+      }
+      .day-number {
+         padding: $spacing / 2 !important;
+         text-align: left;
+         position: absolute;
+         top: 0;
+         left: 0;
+         border: 1px solid black;
       }
    }
 }

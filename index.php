@@ -14,19 +14,43 @@ class Calendar {
    public static function load_assets() {
       wp_enqueue_style("calendar", plugin_dir_url( __FILE__ ) . "/assets/stylesheets/calendar.css" );
    }
-   public function do_calendar() {
+   public function render_html( $args ) {
 
-      $view = "month";
+      if( is_array($args) ) {
+         if( array_key_exists('view', $args) ) {
+            $view = $args['view'];
+         }
+         if( array_key_exists('day', $args) ) {
+            $day = $args['day'];
+         }
+         if( array_key_exists('month', $args) ) {
+            $month = $args['month'];
+         }
+         if( array_key_exists('year', $args) ) {
+            $year = $args['year'];
+         }
+      } else {
+         die;
+      }
+
+      $args_date = strtotime( $month . "/" .  $day . "/" .  $year );
+      // echo strftime( "%e", $args_date );
 
       $week_day_initials = ["l", "m", "m", "j", "v", "s", "d" ];
 
-      $date = strtotime( "today" ); //$month . "/" . $day . "/" . $year );
-      $monthName = strftime( "%B", $date );
-      $dayName     = strftime( "%A", $date );
-      $day     = strftime( "%e", $date );
-      $month   = strftime( "%m", $date );
-      $year    = strftime( "%G", $date );
+      $today_date = strtotime( "today" ); //$month . "/" . $day . "/" . $year );
+      $today_monthName = strftime( "%B", $today_date );
+      $today_dayName     = strftime( "%A", $today_date );
+      $today_day     = strftime( "%e", $today_date );
+      $today_month   = strftime( "%m", $today_date );
+      $today_year    = strftime( "%G", $today_date );
 
+      $date = strtotime( "today" ); //$month . "/" . $day . "/" . $args_year );
+      $monthName = strftime( "%B", $args_date );
+      $dayName     = strftime( "%A", $args_date );
+      $day     = strftime( "%e", $args_date );
+      $month   = strftime( "%m", $args_date );
+      $year    = strftime( "%G", $args_date );
       ?>
       <section id="calendar " class="calendar w_100 h_100">
 
@@ -36,7 +60,7 @@ class Calendar {
 
    ?>
    <small>
-      <?php echo $dayName . ", " . $day . " de " . $monthName . ", " . $year; ?>
+      <?php echo $today_dayName . ", " . $today_day . " de " . $today_monthName . ", " . $today_year; ?>
    </small>
 
    <?php } ?>
@@ -100,9 +124,9 @@ class Calendar {
 
                   ?>
                   <div class="day button enabled <?php echo $i==$day ? ' today ' : ''; ?> <?php echo $q->post_count > 0 ? 'full' : 'empty'; ?>" data-posts="<?php echo json_encode($post_ids); ?>">
-                     <div class="day-number">
+                     <sup class="day-number">
                         <?php echo $i; ?>
-                     </div>
+                     </sup>
                      <div class="day-posts">
                         <?php
                         if( $q->post_count > 0 ) {
@@ -146,9 +170,32 @@ class Calendar {
       return $query;
    }
 
+   public function start_calendar() {
+
+         $args = array(
+            'view'=>'month',
+            'day'=>'20',
+            'month'=>'8',
+            'year'=>'2016',
+         );
+
+
+         $this->render_html($args);
+
+
+   }
+
 }
 
-$calendar = new Calendar();
-add_shortcode( 'calendar', array( $calendar,'do_calendar'));
+
+
+add_action('init', 'calendar_init');
+
+function calendar_init() {
+   $calendar = new Calendar();
+
+
+   add_shortcode( 'calendar', array( $calendar,'start_calendar'));
+}
 
 ?>
