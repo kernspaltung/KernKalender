@@ -2,29 +2,41 @@
 /*
 Plugin Name: KernKalender
 Author: kernspaltung!
-Description: Flexible Calendar for WordPress developers. Features API and with automatic view rendering and shortcodes for dummies
+Description: Flexible KernKalender for WordPress developers. Features API and with automatic view rendering and shortcodes for dummies
 */
 
-class Calendar {
+class KernKalender {
 
    var
-   $today_date,
-   $today_monthName,
-   $today_dayName,
-   $today_day,
-   $today_month,
-   $today_year,
-
+   $today,
    $date,
-   $monthName,
-   $dayName,
    $day,
    $month,
-   $year;
+   $year,
+   $formatter;
 
    function __construct() {
+
+      $this->today = array();
+      $this->today['date'] = new DateTime();
+      $this->formatter = new IntlDateFormatter('es_ES', IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
+      $this->today['day']     = $this->today['date']->format('d');
+      $this->today['month']   = $this->today['date']->format('m');
+      $this->today['year']    = $this->today['date']->format('Y');
+
+
+
+
       add_action("wp_enqueue_scripts", array( $this, "load_assets") );
       date_default_timezone_set('America/Mexico_City');
+
+      function add_query_vars_filter( $vars ){
+       $vars[] = "d";
+      //  $vars[] = "m";
+      //  $vars[] = "y";
+       return $vars;
+      }
+      add_filter( 'query_vars', 'add_query_vars_filter' );
 
    }
 
@@ -34,42 +46,37 @@ class Calendar {
    }
 
 
-   public function load_view( $args ) {
+   public function load_date( $args ) {
 
-      if( is_array($args) ) {
-         if( array_key_exists('view', $args) ) {
-            $view = $args['view'];
+      if( $args) {
+         if( is_array( $args ) ) {
+
+            if( array_key_exists('view', $args) ) {
+               $view = $args['view'];
+            }
+            if( array_key_exists('day', $args) ) {
+               $day = $args['day'];
+            }
+            if( array_key_exists('month', $args) ) {
+               $month = $args['month'];
+            }
+            if( array_key_exists('year', $args) ) {
+               $year = $args['year'];
+            }
+
+
          }
-         if( array_key_exists('day', $args) ) {
-            $day = $args['day'];
-         }
-         if( array_key_exists('month', $args) ) {
-            $month = $args['month'];
-         }
-         if( array_key_exists('year', $args) ) {
-            $year = $args['year'];
-         }
+
       } else {
-         die;
+
+         $view = "month";
+         $day = $this->today['day'];
+         $month = $this->today['month'];
+         $year = $this->today['year'];
+
       }
 
-      $args_date = strtotime( $month . "/" .  $day . "/" .  $year );
-      // echo strftime( "%e", $args_date );
 
-
-      $today_date = strtotime( "today" ); //$month . "/" . $day . "/" . $year );
-      $this->today_monthName = strftime( "%B", $today_date );
-      $this->today_dayName     = strftime( "%A", $today_date );
-      $this->today_day     = strftime( "%e", $today_date );
-      $this->today_month   = strftime( "%m", $today_date );
-      $this->today_year    = strftime( "%G", $today_date );
-
-      $this->date = strtotime( "today" ); //$month . "/" . $day . "/" . $args_year );
-      $this->monthName = strftime( "%B", $args_date );
-      $this->dayName     = strftime( "%A", $args_date );
-      $this->day     = strftime( "%e", $args_date );
-      $this->month   = strftime( "%m", $args_date );
-      $this->year    = strftime( "%G", $args_date );
 
       ?>
 
@@ -78,7 +85,10 @@ class Calendar {
 
          <header>
             <small>
-               <?php echo $this->today_dayName . ", " . $this->today_day . " de " . $this->today_monthName . ", " . $this->today_year; ?>
+               <?php
+               $this->formatter->setPattern("EEEE d 'de' MMMM', 'yyyy");
+               echo $this->formatter->format( $this->date );
+               ?>
             </small>
          </header>
          <?php $html_id = "calendar-". $view ."-view"; ?>
@@ -87,10 +97,10 @@ class Calendar {
          <?php
          switch( $view ) {
             case "day":
-               $this->render_day_view();
+               $this->render_day_view($day,$month,$year);
                break;
             case "month":
-               $this->render_month_view();
+               $this->render_month_view($day,$month,$year);
                break;
          }
 
@@ -101,7 +111,7 @@ class Calendar {
       <?php
    }
 
-   public function render_month_view() {
+   public function render_month_view($d,$m,$y) {
 
       $week_day_initials = ["l", "m", "m", "j", "v", "s", "d" ];
 
@@ -116,7 +126,10 @@ class Calendar {
                </div>
                <div class="three-quarters text-center">
                   <h2>
-                     <?php echo $this->monthName; ?>
+                     <?php
+                     $this->formatter->setPattern("MMMM");
+                     echo $this->formatter->format( $this->date );
+                     ?>
                   </h2>
                </div>
                <div class="arrow-next eight text-right">
@@ -140,13 +153,13 @@ class Calendar {
             // function get_weekdays($m,$y) {
 
 
-            $days_in_month = cal_days_in_month( CAL_GREGORIAN, $this->month, $this->year );
+            $days_in_month = cal_days_in_month( CAL_GREGORIAN, $m, $y );
 
-            $date = strtotime( $this->month.'/1/'.$this->year);
+            $date_day1 = strtotime( $m.'/1/'.$y );
 
-            $num_week_day1 = $date = strftime("%u", $date );
+            $num_day1 = strftime("%u", $date_day1 );
 
-            for ($i=1; $i <= $num_week_day1 - 1; $i++) {
+            for ($i=1; $i <= $num_day1 - 1; $i++) {
                ?>
                <div class="weekday empty button disabled" style="">
                </div>
@@ -155,17 +168,19 @@ class Calendar {
 
 
             for ($i=1; $i <= $days_in_month; $i++) {
-               $date = strtotime( $date );
-               $name_week_day = $date = strftime("%A", $date );
-               $date = strtolower($date);
+               $date = strtotime( $m . "/" . $d . "/" . $y );
+               $name_week_day = strftime("%A", $date );
+               // $date = strtolower($date);
 
-               $q = $this->get_date_posts_query( $i, $this->month, $this->year );
+               $q = $this->get_date_posts_query( $i, $m, $y );
 
                $full = $q->post_count > 0;
 
                if ( $full ) {
+                  $this->formatter->setPattern("dd'-'MM'-'yyyy");
 
-                  $current_uri = add_query_arg( 'day', $i . '-' . $this->month . '-' . $this->year );
+                  $current_uri = add_query_arg( 'd', $this->formatter->format( $date ) );
+
                   $link = $current_uri;
 
                }
@@ -174,7 +189,7 @@ class Calendar {
 
 
                ?>
-               <div class="day button enabled <?php echo $i==$this->day ? ' today ' : ''; ?> <?php echo $full ? 'full' : 'empty'; ?>" data-posts="<?php echo json_encode($post_ids); ?>">
+               <div class="day button enabled <?php echo $i==$d ? ' today ' : ''; ?> <?php echo $full ? 'full' : 'empty'; ?>" data-posts="<?php echo json_encode($post_ids); ?>">
                   <?php echo $full ? '<a href="'.$link.'">' : ''; ?>
                   <sup class="day-number">
                      <?php echo $i; ?>
@@ -206,8 +221,7 @@ class Calendar {
 
    }
 
-   public function render_day_view() {
-
+   public function render_day_view($d,$m,$y) {
 
       ?>
 
@@ -220,11 +234,11 @@ class Calendar {
                <div class="three-quarters text-center">
                   <h2>
                      <?php
-                     echo $this->day . ", ";
+                     echo $d . " de ";
 
-                     echo $this->dayName . ", ";
+                     echo strftime("%B",strtotime($m.'/'.$d.'/'.$y)) . ", ";
 
-                     echo $this->monthName . ", ";
+                     echo $y;
 
                      ?>
                   </h2>
@@ -239,7 +253,7 @@ class Calendar {
          <section class="posts">
             <?php
 
-               $q = $this->get_date_posts_query( $this->day, $this->month, $this->year );
+               $q = $this->get_date_posts_query( $d, $m, $y );
 
                if($q->have_posts() ) {
                   while ( $q->have_posts() ) {
@@ -276,6 +290,11 @@ class Calendar {
 
    }
 
+
+
+
+
+
    public function get_date_posts_query( $d, $m, $y ) {
 
       $args = array(
@@ -290,28 +309,60 @@ class Calendar {
       $query = new WP_Query( $args );
 
       return $query;
+
    }
+
+
+
 
    public function start_calendar() {
 
-         $view = get_query_var('day');
-         var_dump( $view );
-         // $args = array(
-         //    'view'=>'day',
-         //    'day'=>'26',
-         //    'month'=>'8',
-         //    'year'=>'2016',
-         // );
-         //
+      $args = NULL;
+      $d = get_query_var('d');
+      if( $d != "" ) {
+
+         $date = date_parse_from_format('j-m-Y', $d);
+
+
+         if( $date ) {
+
+            $this->day     = $date['day'];
+            $this->month   = $date['month'];
+            $this->year    = $date['year'];
+            $this->date    = $date;
+
+            $view = "day";
+
+
+            $args = array(
+               'view' => $view,
+               'day' => $this->day,
+               'month' => $this->month,
+               'year' => $this->year,
+            );
+         }
+      } else {
+
+         $this->day     = strftime( "%e", $this->today['day'] );
+         $this->month   = strftime( "%m", $this->today['month'] );
+         $this->year    = strftime( "%G", $this->today['year'] );
+         $this->date    = $this->today['date'];
+
+         $view = "month";
+
          $args = array(
-            'view'=>'month',
-            'day'=>'20',
-            'month'=>'8',
-            'year'=>'2016',
+            'view' => "month",
+            'day' => 26,
+            'month' => 8,
+            'year' => 2016
          );
+      }
 
 
-         $this->load_view($args);
+
+
+
+         $this -> load_date( $args );
 
 
    }
@@ -324,7 +375,8 @@ add_action('init', 'calendar_init');
 
 function calendar_init() {
 
-   $calendar = new Calendar();
+   setlocale(LC_TIME, "es_ES.UTF-8" );
+   $calendar = new KernKalender();
 
 
    add_shortcode( 'calendar', array( $calendar,'start_calendar'));
@@ -333,11 +385,5 @@ function calendar_init() {
 
 }
 
-//
-// function add_query_vars_filter( $vars ){
-//  $vars[] = "day";
-//  return $vars;
-// }
-// add_filter( 'query_vars', 'add_query_vars_filter' );
 
 ?>
