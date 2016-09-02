@@ -46,6 +46,76 @@ class KernKalender {
    }
 
 
+   public function arrow_link($direction="previous", $view,$month,$year,$day ) {
+
+      $params = array();
+
+
+      $increment = $direction == "previous" ? -1 : 1;
+      if( $view == "month" ) {
+
+      $arrow_month=(( $month + $increment )%12);
+
+      $arrow_year=$year;
+      if( $arrow_month == 0 || $arrow_month == 13 )
+         $arrow_year = $year+$increment;
+
+
+      }
+      if( $view == "day" ) {
+
+         $arrow_month=$month;
+         $arrow_year=$year;
+
+         $arrow_month_days = cal_days_in_month(CAL_GREGORIAN, $arrow_month, $arrow_year);
+
+         $arrow_day=$day + $increment;
+
+         if( $arrow_day <= 0 || $arrow_day > $arrow_month_days ) {
+
+            $arrow_month += $increment;
+
+            if( $arrow_month <= 0 || $arrow_month >= 13 ){
+
+               if( $arrow_month <= 0 ){
+                  $arrow_month = 12;
+               }
+               if( $arrow_month > 12 ) {
+                  $arrow_month = 1;
+               }
+               $arrow_year += $increment;
+
+            }
+
+            if( $arrow_day > $arrow_month_days ) {
+               $arrow_day = 1;
+            }
+            
+            $arrow_month_days = cal_days_in_month(CAL_GREGORIAN, $arrow_month, $arrow_year);
+
+            if( $arrow_day <= 0 ){
+               $arrow_day = $arrow_month_days;
+            }
+
+
+         }
+
+         $params['dd'] = $arrow_day;
+
+      }
+
+      $params['mm'] = $arrow_month;
+      $params['yy'] = $arrow_year;
+
+
+      $current_uri = add_query_arg( $params );
+      $link = $current_uri;
+      return $link;
+
+   }
+
+
+
    public function load_date( $args ) {
 
       if( $args) {
@@ -90,6 +160,43 @@ class KernKalender {
                echo "<b>hoy:</b> " . $this->formatter->format( $this->today['date'] );
                ?>
             </small>
+
+
+
+            <nav>
+               <div class="arrow-previous eight text-left">
+
+                  <a href="<?php echo $this->arrow_link("previous",$view,$month,$year,$day); ?>">
+                     previous
+                  </a>
+               </div>
+               <div class="three-quarters text-center">
+                  <h2>
+                     <?php
+                     switch( $view ) {
+                        case "month":
+                           $this->formatter->setPattern("MMMM");
+                           echo $this->formatter->format( $this->date );
+                           break;
+                        case "day":
+                           echo $day . " de ";
+                           echo strftime("%B",strtotime($month.'/'.$day.'/'.$year)) . ", ";
+                           echo $year;
+                           break;
+                     }
+
+                     ?>
+                  </h2>
+               </div>
+               <div class="arrow-next eight text-right">
+
+                  <a href="<?php echo $this->arrow_link("next",$view,$month,$year,$day); ?>">
+                     next
+                  </a>
+               </div>
+            </nav>
+
+
          </header>
          <?php $html_id = "calendar-". $view ."-view"; ?>
          <section id="<?php echo $html_id; ?>" class="calendar-view <?php echo $html_id; ?>">
@@ -120,23 +227,6 @@ class KernKalender {
 
          <header>
 
-            <nav>
-               <div class="arrow-previous eight text-left">
-                  previous
-               </div>
-               <div class="three-quarters text-center">
-                  <h2>
-                     <?php
-
-                     $this->formatter->setPattern("MMMM");
-                      echo $this->formatter->format( $this->date );
-                     ?>
-                  </h2>
-               </div>
-               <div class="arrow-next eight text-right">
-                  next
-               </div>
-            </nav>
 
             <nav class="week-days">
                <?php for ($i=0; $i < 7; $i++) {
@@ -177,6 +267,7 @@ class KernKalender {
                // $full = 1;//$q->post_count > 0;
 
                if ( $full ) {
+
                   $params = array();
 
                   $params['dd'] = $i;
@@ -229,31 +320,6 @@ class KernKalender {
 
       ?>
 
-         <header>
-
-            <nav>
-               <div class="arrow-previous eight text-left">
-                  previous
-               </div>
-               <div class="three-quarters text-center">
-                  <h2>
-                     <?php
-                     echo $d . " de ";
-
-                     echo strftime("%B",strtotime($m.'/'.$d.'/'.$y)) . ", ";
-
-                     echo $y;
-
-                     ?>
-                  </h2>
-               </div>
-               <div class="arrow-next eight text-right">
-                  next
-               </div>
-            </nav>
-
-
-         </header>
          <section class="posts">
             <?php
 
@@ -268,19 +334,27 @@ class KernKalender {
                      $image = get_the_post_thumbnail();
                      $excerpt = get_the_excerpt();
                      ?>
+
                      <a href="<?php echo $link; ?>">
+
                         <article>
+
                            <h6>
                               <?php echo $title; ?>
                            </h6>
+
                            <div class="image">
                               <?php echo $image; ?>
                            </div>
+
                            <div class="excerpt">
                               <?php echo $excerpt; ?>
                            </div>
+
                         </article>
+
                      </a>
+
                      <?php
                   }
                }
@@ -299,8 +373,11 @@ class KernKalender {
 
 
 
-   public function get_date_posts_query( $d, $m, $y ) {
+   public function get_date_posts_query( $d, $m, $y, $post_types=array('post'), $num=-1 ) {
+
       $args = array(
+         'posts_per_page' => $num,
+         'post_type' => $post_types,
          'date_query' => array(
       		array(
       			'year'  => $y,
@@ -309,6 +386,7 @@ class KernKalender {
       		),
       	),
       );
+
       $query = new WP_Query( $args );
 
       return $query;
@@ -355,7 +433,6 @@ class KernKalender {
             $this->year    = $date['year'];
             $this->date    = $date;
             $view = "day";
-
 
          }
 
