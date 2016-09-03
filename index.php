@@ -16,6 +16,8 @@ class KernKalender {
    $formatter,
    $view;
 
+   var $loaded_query_vars;
+
    function __construct() {
 
       $this->today = array();
@@ -38,6 +40,8 @@ class KernKalender {
        return $vars;
       }
       add_filter( 'query_vars', 'add_query_vars_filter' );
+
+      $this->loaded_query_vars = false;
 
    }
 
@@ -351,64 +355,72 @@ class KernKalender {
    }
 
 
+   public function load_query_vars() {
+
+      if( ! $this->loaded_query_vars ) {
+
+         $args = NULL;
+
+         $d = get_query_var('dd');
+         $m = get_query_var('mm');
+         $y = get_query_var('yy');
+
+         $view = "month";
+
+         if( $d == "" && $m != "" && $y != "" ) {
+
+            $this->day     = 1;
+            $this->month   = $m;
+            $this->year    = $y;
+
+            $this->date    = date_create_from_format(
+               'j-n-Y',
+               $this->day . "-" .
+               $this->month . "-" .
+               $this->year
+            );
+
+            $view = "month";
+
+         } elseif( strcmp($d,"") && strcmp($m,"") && strcmp($y,"")  ) {
+
+
+            $date = date_parse_from_format('j-m-Y', $d . "-" . $m . "-" . $y );
+
+            if( $date ) {
+
+               $this->day     = $date['day'];
+               $this->month   = $date['month'];
+               $this->year    = $date['year'];
+               $this->date    = $date;
+               $view = "day";
+
+            }
+
+
+         } else {
+
+            $this->date    = $this->today['date'];
+
+            $this->day     = $this->today['date']->format('j');
+            $this->month   = $this->today['date']->format('n');
+            $this->year    = $this->today['date']->format('y');
+
+            $view = "month";
+         }
+
+         $this->view = $view;
+
+      }
+   }
 
 
    public function render_kalender() {
 
-      $args = NULL;
-
-      $d = get_query_var('dd');
-      $m = get_query_var('mm');
-      $y = get_query_var('yy');
-
-      $view = "month";
-
-      if( $d == "" && $m != "" && $y != "" ) {
-
-         $this->day     = 1;
-         $this->month   = $m;
-         $this->year    = $y;
-
-         $this->date    = date_create_from_format(
-            'j-n-Y',
-            $this->day . "-" .
-            $this->month . "-" .
-            $this->year
-         );
-
-         $view = "month";
-
-      } elseif( strcmp($d,"") && strcmp($m,"") && strcmp($y,"")  ) {
-
-
-         $date = date_parse_from_format('j-m-Y', $d . "-" . $m . "-" . $y );
-
-         if( $date ) {
-
-            $this->day     = $date['day'];
-            $this->month   = $date['month'];
-            $this->year    = $date['year'];
-            $this->date    = $date;
-            $view = "day";
-
-         }
-
-
-      } else {
-
-         $this->date    = $this->today['date'];
-
-         $this->day     = $this->today['date']->format('j');
-         $this->month   = $this->today['date']->format('n');
-         $this->year    = $this->today['date']->format('y');
-
-         $view = "month";
-      }
-
-      $this->view = $view;
+      $this -> load_query_vars();
 
       $args = array(
-         'view' => $view,
+         'view' => $this->view,
          'day' => $this->day,
          'month' => $this->month,
          'year' => $this->year
@@ -422,6 +434,8 @@ class KernKalender {
 
 
    public function render_kalender_posts() {
+
+      $this -> load_query_vars();
 
       ?>
 
