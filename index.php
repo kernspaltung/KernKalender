@@ -43,6 +43,10 @@ class KernKalender {
 
       $this->loaded_query_vars = false;
 
+
+
+      $this->add_render_post_function( array($this, "default_render_post_function" ) );
+
    }
 
 
@@ -477,34 +481,9 @@ class KernKalender {
                if($q->have_posts() ) {
                   while ( $q->have_posts() ) {
                      $q->the_post();
-                     $ID = get_the_ID();
-                     $link = get_the_permalink( $ID );
-                     $title = get_the_title();
-                     $image = get_the_post_thumbnail();
-                     $excerpt = get_the_excerpt();
-                     ?>
 
-                     <a href="<?php echo $link; ?>">
+                     $this->render_post();
 
-                        <article>
-
-                           <h6>
-                              <?php echo $title; ?>
-                           </h6>
-
-                           <div class="image">
-                              <?php echo $image; ?>
-                           </div>
-
-                           <div class="excerpt">
-                              <?php echo $excerpt; ?>
-                           </div>
-
-                        </article>
-
-                     </a>
-
-                     <?php
                   }
                }
 
@@ -513,6 +492,48 @@ class KernKalender {
 
          </section>
 
+         <?php
+
+      }
+
+
+      public function render_post() {
+         call_user_func($this->render_post_function);
+      }
+
+
+      public function add_render_post_function( $function ) {
+         $this->render_post_function = $function;
+      }
+
+      public function default_render_post_function() {
+         global $post;
+         $ID = get_the_ID();
+         $link = get_the_permalink( $ID );
+         $title = get_the_title();
+         $image = get_the_post_thumbnail();
+         $excerpt = get_the_excerpt();
+         ?>
+
+         <a href="<?php echo $link; ?>">
+
+            <article>
+
+               <h6>
+                  <?php echo $title; ?>
+               </h6>
+
+               <div class="image">
+                  <?php echo $image; ?>
+               </div>
+
+               <div class="excerpt">
+                  <?php echo $excerpt; ?>
+               </div>
+
+            </article>
+
+         </a>
          <?php
 
       }
@@ -528,6 +549,43 @@ function calendar_init() {
 
    setlocale(LC_TIME, "es_ES.UTF-8" );
    $calendar = new KernKalender();
+
+
+
+   $newFunc = function() {
+
+      global $post;
+      $ID = get_the_ID();
+      $link = get_the_permalink( $ID );
+      $title = get_the_title();
+      $image = get_the_post_thumbnail();
+      $excerpt = get_the_excerpt();
+      ?>
+
+      <a href="<?php echo $link; ?>">
+
+         <article>
+
+            <h1>
+               <?php echo $title; ?>
+            </h1>
+
+            <div class="image">
+               <?php echo $image; ?>
+            </div>
+
+            <div class="excerpt">
+               <?php echo $excerpt; ?>
+            </div>
+
+         </article>
+
+      </a>
+      <?php
+
+   };
+
+   $calendar -> add_render_post_function( $newFunc );
 
 
    add_shortcode( 'kalender', array( $calendar,'render_kalender'));
