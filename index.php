@@ -18,6 +18,8 @@ class KernKalender {
 
    var $loaded_query_vars;
 
+   var $render_post_function;
+
    function __construct() {
 
       $this->today = array();
@@ -40,6 +42,8 @@ class KernKalender {
        return $vars;
       }
       add_filter( 'query_vars', 'add_query_vars_filter' );
+
+
 
       $this->loaded_query_vars = false;
 
@@ -154,8 +158,6 @@ class KernKalender {
          $year = $this->today['year'];
 
       }
-
-
 
       ?>
 
@@ -408,8 +410,8 @@ class KernKalender {
 
             $this->day     = $this->today['date']->format('j');
             $this->month   = $this->today['date']->format('n');
-            $this->year    = $this->today['date']->format('y');
-
+            $this->year    = $this->today['date']->format('Y');
+            
             $view = "month";
          }
 
@@ -498,7 +500,7 @@ class KernKalender {
 
 
       public function render_post() {
-         call_user_func($this->render_post_function);
+         call_user_func( $this->render_post_function );
       }
 
 
@@ -548,6 +550,7 @@ add_action('init', 'calendar_init');
 function calendar_init() {
 
    setlocale(LC_TIME, "es_ES.UTF-8" );
+
    $calendar = new KernKalender();
 
 
@@ -560,6 +563,7 @@ function calendar_init() {
       $title = get_the_title();
       $image = get_the_post_thumbnail();
       $excerpt = get_the_excerpt();
+
       ?>
 
       <a href="<?php echo $link; ?>">
