@@ -1,3 +1,6 @@
+.font-small, .arrow {
+  font-size: 11px !important; }
+
 .f-l, .seventh, .calendar-view .day, .calendar-view .weekday-header, .quarter, .eight, .three-quarters {
   float: left; }
 
@@ -5,7 +8,7 @@
   display: inline-block; }
 
 .seventh, .calendar-view .day, .calendar-view .weekday-header {
-  width: 14.2%; }
+  width: calc(100% / 7); }
 
 .quarter {
   width: 25%; }
@@ -32,7 +35,7 @@
   padding: 5px;
   text-align: center;
   font-size: 14px;
-  height: 80px;
+  height: 50px;
   position: relative; }
   .calendar-view .day.today {
     background-color: #222;

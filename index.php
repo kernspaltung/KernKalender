@@ -55,7 +55,14 @@ class KernKalender {
 
 
    public static function load_assets() {
-      wp_enqueue_style("calendar", plugin_dir_url( __FILE__ ) . "/assets/stylesheets/calendar.css" );
+
+      wp_enqueue_style( "calendar", plugin_dir_url( __FILE__ ) . "/assets/stylesheets/calendar.css" );
+
+      wp_enqueue_script( "jquery", plugin_dir_url( __FILE__ ) . "/bower_components/jquery/dist/jquery.min.js" );
+      wp_enqueue_script( "jquery-ui-core", plugin_dir_url( __FILE__ ) . "/bower_components/jqueryui-datepicker/core.js", array('jquery') );
+      wp_enqueue_script( "jquery-ui-datepicker", plugin_dir_url( __FILE__ ) . "/bower_components/jqueryui-datepicker/datepicker.js", array('jquery') );
+
+      wp_enqueue_script( "kernkalender", plugin_dir_url( __FILE__ ) . "/assets/js/kernkalender.js", array('jquery-ui-datepicker') );
    }
 
 
@@ -175,22 +182,25 @@ class KernKalender {
 
 
             <nav>
-               <div class="arrow-previous eight text-left">
+               <div class="arrow arrow-previous eight text-left">
 
                   <a href="<?php echo $this->arrow_link("previous",$view,$month,$year,$day); ?>">
                      previous
                   </a>
+
                </div>
                <div class="three-quarters text-center">
                   <h2>
                      <?php
                      switch( $view ) {
+
                         case "month":
                            $this->formatter->setPattern("MMMM");
                            echo $this->formatter->format( $this->date );
                            break;
+
                         case "day":
-                           echo $day . " de ";
+                              echo $day . " de ";
                            echo strftime("%B",strtotime($month.'/'.$day.'/'.$year)) . ", ";
                            echo $year;
                            break;
@@ -199,7 +209,7 @@ class KernKalender {
                      ?>
                   </h2>
                </div>
-               <div class="arrow-next eight text-right">
+               <div class="arrow arrow-next eight text-right">
 
                   <a href="<?php echo $this->arrow_link("next",$view,$month,$year,$day); ?>">
                      next
@@ -390,7 +400,6 @@ class KernKalender {
 
          } elseif( strcmp($d,"") && strcmp($m,"") && strcmp($y,"")  ) {
 
-
             $date = date_parse_from_format('j-m-Y', $d . "-" . $m . "-" . $y );
 
             if( $date ) {
@@ -403,7 +412,6 @@ class KernKalender {
 
             }
 
-
          } else {
 
             $this->date    = $this->today['date'];
@@ -411,7 +419,7 @@ class KernKalender {
             $this->day     = $this->today['date']->format('j');
             $this->month   = $this->today['date']->format('n');
             $this->year    = $this->today['date']->format('Y');
-            
+
             $view = "month";
          }
 

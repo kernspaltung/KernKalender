@@ -1,0 +1,23 @@
+{
+  "name": "kernkalender",
+  "homepage": "https://github.com/kernspaltung/KernKalender",
+  "authors": [
+    "furenku <furenku@gmail.com>"
+  ],
+  "description": "Flexible Calendar for WordPress developers. Features API and with automatic view rendering and shortcodes",
+  "main": "index.php",
+  "moduleType": [],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jqueryui-datepicker": "^0.0.3",
+    "jquery": "^3.1.0"
+  }
+}

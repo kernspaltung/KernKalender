@@ -1,6 +1,12 @@
 $spacing: 15px;
 $color_accent: #fa0;
 
+$font_small: 11px;
+
+.font-small {
+   font-size: $font_small !important;
+}
+
 .f-l {
    float: left;
 }
@@ -11,7 +17,7 @@ $color_accent: #fa0;
 .seventh {
    @extend .f-l;
    @extend .d-i-b;
-   width: 14.2%;
+   width: calc(100% / 7);
 }
 .quarter {
    @extend .f-l;
@@ -42,6 +48,12 @@ $color_accent: #fa0;
    text-align: right;
 }
 
+
+.arrow {
+   @extend .font-small;
+}
+
+
 .calendar-view {
 
    .day,.weekday-header {
@@ -55,7 +67,7 @@ $color_accent: #fa0;
       border:1px solid #ccc;
       padding:5px; text-align:center; font-size:14px;
 
-      height: 80px;
+      height: 50px;
 
       position: relative;
       &.today {
