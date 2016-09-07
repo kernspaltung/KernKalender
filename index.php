@@ -16,6 +16,8 @@ class KernKalender {
    $formatter,
    $view;
 
+   var $query;
+
    var $loaded_query_vars;
 
    var $render_post_function;
@@ -175,7 +177,7 @@ class KernKalender {
             <small>
                <?php
                $this->formatter->setPattern("EEEE d 'de' MMMM', 'yyyy");
-               echo "<b>hoy:</b> " . $this->formatter->format( $this->today['date'] );
+               echo $this->formatter->format( $this->today['date'] );
                ?>
             </small>
 
@@ -355,6 +357,31 @@ class KernKalender {
    }
 
 
+   public function get_metadata_date_post_query($date_array=array('20000101','20161231'), $post_types=array('date-cpt'), $num=-1 ) {
+
+
+      /*
+      'meta_query' =>
+       */
+
+       $args = array(
+          'posts_per_page' => $num,
+          'post_type' => $post_types,
+          'meta_query' => array(
+            array(
+                'key' => 'test-cpt-date',
+                'value' => $date_array,
+                'compare' => 'BETWEEN',
+                'type' => 'DATE'
+            )
+          )
+       );
+
+       $query = new WP_Query( $args );
+
+       return $query;
+
+   }
 
    public function get_date_posts_query( $date_query, $post_types=array('post'), $num=-1 ) {
 
@@ -486,7 +513,8 @@ class KernKalender {
                }
 
 
-               $q = $this->get_date_posts_query( $date_query, array('post') );
+               // $q = $this->get_date_posts_query( $date_query, array('post') );
+               $q = $this->get_metadata_date_post_query( $date_query, array('date-cpt') );
 
                if($q->have_posts() ) {
                   while ( $q->have_posts() ) {
@@ -506,6 +534,10 @@ class KernKalender {
 
       }
 
+
+      public function add_query( $q ) {
+
+      }
 
       public function render_post() {
          call_user_func( $this->render_post_function );
