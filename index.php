@@ -493,9 +493,13 @@ class KernKalender {
             'month' => $this->month,
             'year' => $this->year
          );
+         ob_start();
 
          $this -> load_date( $args );
 
+         $html = ob_get_contents();
+         ob_clean();
+         return $html;
       }
 
 
@@ -564,7 +568,7 @@ class KernKalender {
                }
                if( $this->view == "day") {
 
-                  $date = new DateTime($this->year.'-'.$this->month.'-'.$this->day);
+                  $date = new DateTime($this->year.'-'.$this->month.'-'.$this->day );
                   $date = $date->format('Ymd');
 
                   $meta_query_value = $date;
@@ -587,6 +591,7 @@ class KernKalender {
 
             $q = new WP_Query( $args );
 
+            ob_start();
 
             if($q->have_posts() ) {
                while ( $q->have_posts() ) {
@@ -597,6 +602,9 @@ class KernKalender {
                }
             }
 
+            $html = ob_get_contents();
+            ob_clean();
+            return $html;
 
             ?>
 
@@ -665,7 +673,7 @@ class KernKalender {
          );
 
          $q = new WP_Query( $args );
-
+         ob_start();
          if($q->have_posts() ) {
             while ( $q->have_posts() ) {
                $q->the_post();
@@ -675,6 +683,9 @@ class KernKalender {
             }
          }
 
+         $html = ob_get_contents();
+         ob_clean();
+         return $html;
       }
 
       public function render_kalender_past_posts() {
@@ -694,7 +705,8 @@ class KernKalender {
 
          $q = new WP_Query( $args );
 
-
+         ob_start();
+         
          if($q->have_posts() ) {
             while ( $q->have_posts() ) {
                $q->the_post();
@@ -704,6 +716,9 @@ class KernKalender {
             }
          }
 
+         $html = ob_get_contents();
+         ob_clean();
+         return $html;
       }
 
    }
