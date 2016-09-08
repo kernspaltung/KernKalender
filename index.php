@@ -51,6 +51,10 @@ class KernKalender {
 
 
 
+      $this->metadata_key = 0;
+
+
+
       $this->loaded_query_vars = false;
 
 
@@ -78,9 +82,18 @@ class KernKalender {
       array_push( $this -> post_types, $post_type );
 
    }
+
+
    public function add_metadata_key( $key ) {
 
       $this->metadata_key = $key;
+
+   }
+
+
+   public function set_view( $view ) {
+
+      $this -> view = $view;
 
    }
 
@@ -309,7 +322,7 @@ class KernKalender {
                      'year'   => $y,
                   ),
                );
-               $q = $this->get_date_posts_query( $date_query, array('post') );
+               $q = $this->get_date_posts_query( $date_query, $this->post_types );
 
                $full = $q->post_count > 0;
 
@@ -327,9 +340,9 @@ class KernKalender {
 
                   $link = $current_uri;
 
+                  $post_ids = wp_list_pluck( $q->posts, 'ID' );
                }
 
-               $post_ids = wp_list_pluck( $q->posts, 'ID' );
 
 
                ?>
@@ -373,13 +386,38 @@ class KernKalender {
 
          }
 
-         public function get_date_posts_query( $date_query, $post_types=array('post'), $num=-1 ) {
+         public function get_date_posts_query( $date_query, $post_types=0, $num=-1 ) {
+            if( ! $post_types ) {
+               $post_types = $this->post_types;
+            }
 
-            $args = array(
-               'posts_per_page' => $num,
-               'post_type' => $post_types,
-               'date_query' => $date_query,
-            );
+            if( $this->metadata_key ) {
+               $date_vars = $date_query[0];
+
+               $date = new DateTime( $date_vars['year'].'-'.$date_vars['month'].'-'.$date_vars['day'] );
+               // echo $date->format('Y-m-d');
+               $args = array(
+                  'posts_per_page' => $num,
+                  'post_type' => $post_types,
+                  'meta_query' => array(
+                     array(
+                        'key' => $this->metadata_key,
+                        'value' => $date->format('Ymd'),
+                        'compare' => '==',
+                        'type' => 'DATE'
+                     )
+                  )
+               );
+
+            } else {
+
+               $args = array(
+                  'posts_per_page' => $num,
+                  'post_type' => $post_types,
+                  'date_query' => $date_query,
+               );
+
+            }
 
             $query = new WP_Query( $args );
 
@@ -398,7 +436,7 @@ class KernKalender {
                $m = get_query_var('mm');
                $y = get_query_var('yy');
 
-               $view = "month";
+               $this->view = "month";
 
                if( $d == "" && $m != "" && $y != "" ) {
 
@@ -413,7 +451,7 @@ class KernKalender {
                   $this->year
                );
 
-               $view = "month";
+               $this->view = "month";
 
             } elseif( strcmp($d,"") && strcmp($m,"") && strcmp($y,"")  ) {
 
@@ -425,7 +463,7 @@ class KernKalender {
                   $this->month   = $date['month'];
                   $this->year    = $date['year'];
                   $this->date    = $date;
-                  $view = "day";
+                  $this->view = "day";
 
                }
 
@@ -437,10 +475,9 @@ class KernKalender {
                $this->month   = $this->today['date']->format('n');
                $this->year    = $this->today['date']->format('Y');
 
-               $view = "month";
+               $this->view = "month";
             }
 
-            $this->view = $view;
 
          }
       }
@@ -613,6 +650,7 @@ class KernKalender {
       }
 
       public function render_kalender_past_posts() {
+
          $args = array(
             'posts_per_page' => -1,
             'post_type' => $this->post_types,
@@ -653,7 +691,10 @@ class KernKalender {
 
       $calendar = new KernKalender();
 
+      $calendar -> set_view('month');
+
       $calendar -> add_post_type('date-cpt');
+
       $calendar -> add_metadata_key('test-cpt-date');
 
       $newFunc = function($calendar) {
