@@ -395,7 +395,7 @@ class KernKalender {
                $date_vars = $date_query[0];
 
                $date = new DateTime( $date_vars['year'].'-'.$date_vars['month'].'-'.$date_vars['day'] );
-               // echo $date->format('Y-m-d');
+
                $args = array(
                   'posts_per_page' => $num,
                   'post_type' => $post_types,
@@ -507,7 +507,7 @@ class KernKalender {
 
          ?>
 
-         <section class="posts">
+         <section class="posts <?php echo implode(" ", $this->post_types ); ?>">
             <?php
 
             if( $this->view == "month" ) {
@@ -515,14 +515,14 @@ class KernKalender {
                $date_query = array(
                   $date_query = array(
                      'after'  => array(
-                        'year'  => 2016,
-                        'month' => 8,
+                        'year'  => $this->year,
+                        'month' => $this->month,
                         'day'   => 1,
                      ),
                      'before' => array(
-                        'year'  => 2016,
-                        'month' => 8,
-                        'day'   => 31,
+                        'year'  => $this->year,
+                        'month' => $this->month,
+                        'day'   => cal_days_in_month(CAL_GREGORIAN, $this->month, $this->year ),
                      ),
                      'inclusive' => true,
                   )
@@ -547,15 +547,43 @@ class KernKalender {
             $args = array(
                'posts_per_page' => -1,
                'post_type' => $this->post_types,
-               'meta_query' => array(
+            );
+
+
+            if( $this->metadata_key ) {
+               if( $this->view == "month") {
+
+                  $date_begin = new DateTime($this->year.'-'.$this->month.'-1');
+                  $date_begin = $date_begin->format('Ymd');
+                  $date_end = new DateTime($this->year.'-'.$this->month.'-'.cal_days_in_month(CAL_GREGORIAN,$this->month,$this->year));
+                  $date_end = $date_end->format('Ymd');
+
+                  $meta_query_value = array( $date_begin, $date_end );
+                  $meta_query_compare = 'BETWEEN';
+
+               }
+               if( $this->view == "day") {
+
+                  $date = new DateTime($this->year.'-'.$this->month.'-'.$this->day);
+                  $date = $date->format('Ymd');
+
+                  $meta_query_value = $date;
+                  $meta_query_compare = '==';
+
+               }
+               $args['meta_query'] = array(
                   array(
                      'key' => $this->metadata_key,
-                     'value' => date('H:i:s'),
-                     'compare' => '>=',
+                     'value' => $meta_query_value,
+                     'compare' => $meta_query_compare,
                      'type' => 'DATE'
                   )
-               )
-            );
+               );
+
+            } else {
+               $args['date_query'] = $date_query;
+            }
+
 
             $q = new WP_Query( $args );
 
