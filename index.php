@@ -16,11 +16,15 @@ class KernKalender {
    $formatter,
    $view;
 
+
    var $query;
 
    var $loaded_query_vars;
 
    var $render_post_function;
+
+   var $post_types;
+   var $metadata_key;
 
    function __construct() {
 
@@ -32,16 +36,16 @@ class KernKalender {
       $this->today['year']    = $this->today['date']->format('Y');
 
 
-
+      $this->post_types = array();
 
       add_action("wp_enqueue_scripts", array( $this, "load_assets") );
       date_default_timezone_set('America/Mexico_City');
 
       function add_query_vars_filter( $vars ){
-       $vars[] = "dd";
-       $vars[] = "mm";
-       $vars[] = "yy";
-       return $vars;
+         $vars[] = "dd";
+         $vars[] = "mm";
+         $vars[] = "yy";
+         return $vars;
       }
       add_filter( 'query_vars', 'add_query_vars_filter' );
 
@@ -65,6 +69,19 @@ class KernKalender {
       wp_enqueue_script( "jquery-ui-datepicker", plugin_dir_url( __FILE__ ) . "/bower_components/jqueryui-datepicker/datepicker.js", array('jquery') );
 
       wp_enqueue_script( "kernkalender", plugin_dir_url( __FILE__ ) . "/assets/js/kernkalender.js", array('jquery-ui-datepicker') );
+
+   }
+
+
+   public function add_post_type( $post_type ) {
+
+      array_push( $this -> post_types, $post_type );
+
+   }
+   public function add_metadata_key( $key ) {
+
+      $this->metadata_key = $key;
+
    }
 
 
@@ -76,10 +93,10 @@ class KernKalender {
       $increment = $direction == "previous" ? -1 : 1;
       if( $view == "month" ) {
 
-      $arrow_month=(( $month + $increment )%12);
+         $arrow_month=(( $month + $increment )%12);
 
-      $arrow_year=$year;
-      if( $arrow_month == 0 || $arrow_month == 13 )
+         $arrow_year=$year;
+         if( $arrow_month == 0 || $arrow_month == 13 )
          $arrow_year = $year+$increment;
 
 
@@ -197,15 +214,15 @@ class KernKalender {
                      switch( $view ) {
 
                         case "month":
-                           $this->formatter->setPattern("MMMM");
-                           echo $this->formatter->format( $this->date );
-                           break;
+                        $this->formatter->setPattern("MMMM");
+                        echo $this->formatter->format( $this->date );
+                        break;
 
                         case "day":
-                              echo $day . " de ";
-                           echo strftime("%B",strtotime($month.'/'.$day.'/'.$year)) . ", ";
-                           echo $year;
-                           break;
+                        echo $day . " de ";
+                        echo strftime("%B",strtotime($month.'/'.$day.'/'.$year)) . ", ";
+                        echo $year;
+                        break;
                      }
 
                      ?>
@@ -224,29 +241,29 @@ class KernKalender {
          <?php $html_id = "calendar-". $view ."-view"; ?>
          <section id="<?php echo $html_id; ?>" class="calendar-view <?php echo $html_id; ?>">
 
-         <?php
-         // switch( $view ) {
-         //    case "day":
-         //       $this->render_day_view($day,$month,$year);
-         //       break;
-         //    case "month":
-         //       $this->render_month_view($day,$month,$year);
-         //       break;
-         // }
-         $this->render_month_view($day,$month,$year);
+            <?php
+            // switch( $view ) {
+            //    case "day":
+            //       $this->render_day_view($day,$month,$year);
+            //       break;
+            //    case "month":
+            //       $this->render_month_view($day,$month,$year);
+            //       break;
+            // }
+            $this->render_month_view($day,$month,$year);
 
             ?>
 
          </section>
 
-      <?php
-   }
+         <?php
+      }
 
-   public function render_month_view($d,$m,$y) {
+      public function render_month_view($d,$m,$y) {
 
-      $week_day_initials = ["l", "m", "m", "j", "v", "s", "d" ];
+         $week_day_initials = ["l", "m", "m", "j", "v", "s", "d" ];
 
-      ?>
+         ?>
 
 
          <header>
@@ -318,212 +335,202 @@ class KernKalender {
                ?>
                <div class="day button enabled <?php #  echo $i==$d ? ' today ' : ''; ?> <?php echo $full ? 'full' : 'empty'; ?>" data-posts="<?php echo json_encode($post_ids); ?>">
                   <?php echo $full ? '<a href="'.$link.'">' : ''; ?>
-                  <sup class="day-number">
-                     <?php echo $i; ?>
-                  </sup>
-                  <div class="day-posts">
-                     <?php
-                     if( $q->post_count > 0 ) {
+                     <sup class="day-number">
+                        <?php echo $i; ?>
+                     </sup>
+                     <div class="day-posts">
+                        <?php
+                        if( $q->post_count > 0 ) {
 
-                     ?>
-                     (
-                        <span class="post-count">
-                           <?php echo $q->post_count; ?>
-                        </span>
-                     )
-                     <?php
-                     }
-                     ?>
+                           ?>
+                           (
+                           <span class="post-count">
+                              <?php echo $q->post_count; ?>
+                           </span>
+                           )
+                           <?php
+                        }
+                        ?>
+                     </div>
+                     <?php echo $full ? '</a>' : ''; ?>
                   </div>
-                  <?php echo $full ? '</a>' : ''; ?>
-               </div>
-               <?php
-            }
+                  <?php
+               }
 
 
-            ?>
-         </ul>
+               ?>
+            </ul>
 
 
-      <?php
+            <?php
 
 
-   }
-
-   public function render_day_view($d,$m,$y) {
-
-
-
-   }
-
-
-   public function get_metadata_date_post_query($date_array=array('20000101','20161231'), $post_types=array('date-cpt'), $num=-1 ) {
-
-
-      /*
-      'meta_query' =>
-       */
-
-       $args = array(
-          'posts_per_page' => $num,
-          'post_type' => $post_types,
-          'meta_query' => array(
-            array(
-                'key' => 'test-cpt-date',
-                'value' => $date_array,
-                'compare' => 'BETWEEN',
-                'type' => 'DATE'
-            )
-          )
-       );
-
-       $query = new WP_Query( $args );
-
-       return $query;
-
-   }
-
-   public function get_date_posts_query( $date_query, $post_types=array('post'), $num=-1 ) {
-
-      $args = array(
-         'posts_per_page' => $num,
-         'post_type' => $post_types,
-         'date_query' => $date_query,
-      );
-
-      $query = new WP_Query( $args );
-
-      return $query;
-
-   }
-
-
-   public function load_query_vars() {
-
-      if( ! $this->loaded_query_vars ) {
-
-         $args = NULL;
-
-         $d = get_query_var('dd');
-         $m = get_query_var('mm');
-         $y = get_query_var('yy');
-
-         $view = "month";
-
-         if( $d == "" && $m != "" && $y != "" ) {
-
-            $this->day     = 1;
-            $this->month   = $m;
-            $this->year    = $y;
-
-            $this->date    = date_create_from_format(
-               'j-n-Y',
-               $this->day . "-" .
-               $this->month . "-" .
-               $this->year
-            );
-
-            $view = "month";
-
-         } elseif( strcmp($d,"") && strcmp($m,"") && strcmp($y,"")  ) {
-
-            $date = date_parse_from_format('j-m-Y', $d . "-" . $m . "-" . $y );
-
-            if( $date ) {
-
-               $this->day     = $date['day'];
-               $this->month   = $date['month'];
-               $this->year    = $date['year'];
-               $this->date    = $date;
-               $view = "day";
-
-            }
-
-         } else {
-
-            $this->date    = $this->today['date'];
-
-            $this->day     = $this->today['date']->format('j');
-            $this->month   = $this->today['date']->format('n');
-            $this->year    = $this->today['date']->format('Y');
-
-            $view = "month";
          }
 
-         $this->view = $view;
+         public function render_day_view($d,$m,$y) {
+
+
+
+         }
+
+         public function get_date_posts_query( $date_query, $post_types=array('post'), $num=-1 ) {
+
+            $args = array(
+               'posts_per_page' => $num,
+               'post_type' => $post_types,
+               'date_query' => $date_query,
+            );
+
+            $query = new WP_Query( $args );
+
+            return $query;
+
+         }
+
+
+         public function load_query_vars() {
+
+            if( ! $this->loaded_query_vars ) {
+
+               $args = NULL;
+
+               $d = get_query_var('dd');
+               $m = get_query_var('mm');
+               $y = get_query_var('yy');
+
+               $view = "month";
+
+               if( $d == "" && $m != "" && $y != "" ) {
+
+                  $this->day     = 1;
+                  $this->month   = $m;
+                  $this->year    = $y;
+
+                  $this->date    = date_create_from_format(
+                  'j-n-Y',
+                  $this->day . "-" .
+                  $this->month . "-" .
+                  $this->year
+               );
+
+               $view = "month";
+
+            } elseif( strcmp($d,"") && strcmp($m,"") && strcmp($y,"")  ) {
+
+               $date = date_parse_from_format('j-m-Y', $d . "-" . $m . "-" . $y );
+
+               if( $date ) {
+
+                  $this->day     = $date['day'];
+                  $this->month   = $date['month'];
+                  $this->year    = $date['year'];
+                  $this->date    = $date;
+                  $view = "day";
+
+               }
+
+            } else {
+
+               $this->date    = $this->today['date'];
+
+               $this->day     = $this->today['date']->format('j');
+               $this->month   = $this->today['date']->format('n');
+               $this->year    = $this->today['date']->format('Y');
+
+               $view = "month";
+            }
+
+            $this->view = $view;
+
+         }
+      }
+
+
+      public function render_kalender() {
+
+         $this -> load_query_vars();
+
+         $args = array(
+            'view' => $this->view,
+            'day' => $this->day,
+            'month' => $this->month,
+            'year' => $this->year
+         );
+
+         $this -> load_date( $args );
 
       }
-   }
-
-
-   public function render_kalender() {
-
-      $this -> load_query_vars();
-
-      $args = array(
-         'view' => $this->view,
-         'day' => $this->day,
-         'month' => $this->month,
-         'year' => $this->year
-      );
-
-      $this -> load_date( $args );
-
-   }
 
 
 
 
-   public function render_kalender_posts() {
+      public function render_kalender_posts() {
 
-      $this -> load_query_vars();
+         $this -> load_query_vars();
 
-      ?>
+         ?>
 
          <section class="posts">
             <?php
 
-               if( $this->view == "month" ) {
+            if( $this->view == "month" ) {
 
+               $date_query = array(
                   $date_query = array(
-                     $date_query = array(
-                        'after'  => array(
-                  			'year'  => 2016,
-                  			'month' => 8,
-                  			'day'   => 1,
-                  		),
-                  		'before' => array(
-                  			'year'  => 2016,
-                  			'month' => 8,
-                  			'day'   => 31,
-                  		),
-                  		'inclusive' => true,
-                     )
-                  );
-
-               } else {
-                  $date_query = array(
-                     array(
-                        'day'  => $this->day,
-                        'month' => $this->month,
-                        'year'   => $this->year,
+                     'after'  => array(
+                        'year'  => 2016,
+                        'month' => 8,
+                        'day'   => 1,
                      ),
-                  );
+                     'before' => array(
+                        'year'  => 2016,
+                        'month' => 8,
+                        'day'   => 31,
+                     ),
+                     'inclusive' => true,
+                  )
+               );
+
+            } else {
+               $date_query = array(
+                  array(
+                     'day'  => $this->day,
+                     'month' => $this->month,
+                     'year'   => $this->year,
+                  ),
+               );
+
+            }
+
+
+            // $q = $this->get_date_posts_query( $date_query, array('post') );
+
+
+
+            $args = array(
+               'posts_per_page' => -1,
+               'post_type' => $this->post_types,
+               'meta_query' => array(
+                  array(
+                     'key' => $this->metadata_key,
+                     'value' => date('H:i:s'),
+                     'compare' => '>=',
+                     'type' => 'DATE'
+                  )
+               )
+            );
+
+            $q = new WP_Query( $args );
+
+
+            if($q->have_posts() ) {
+               while ( $q->have_posts() ) {
+                  $q->the_post();
+
+                  $this->render_post();
 
                }
-
-
-               // $q = $this->get_date_posts_query( $date_query, array('post') );
-               $q = $this->get_metadata_date_post_query( $date_query, array('date-cpt') );
-
-               if($q->have_posts() ) {
-                  while ( $q->have_posts() ) {
-                     $q->the_post();
-
-                     $this->render_post();
-
-                  }
-               }
+            }
 
 
             ?>
@@ -535,12 +542,9 @@ class KernKalender {
       }
 
 
-      public function add_query( $q ) {
-
-      }
 
       public function render_post() {
-         call_user_func( $this->render_post_function );
+         call_user_func( $this->render_post_function, $this );
       }
 
 
@@ -580,66 +584,131 @@ class KernKalender {
 
       }
 
-}
+
+      public function render_kalender_future_posts() {
+         $args = array(
+            'posts_per_page' => -1,
+            'post_type' => 'date-cpt',
+            'meta_query' => array(
+               array(
+                  'key' => $this->metadata_key,
+                  'value' => date('Ymd'),
+                  'compare' => '>=',
+                  'type' => 'DATE'
+               )
+            )
+         );
+
+         $q = new WP_Query( $args );
+
+         if($q->have_posts() ) {
+            while ( $q->have_posts() ) {
+               $q->the_post();
+
+               $this->render_post();
+
+            }
+         }
+
+      }
+
+      public function render_kalender_past_posts() {
+         $args = array(
+            'posts_per_page' => -1,
+            'post_type' => $this->post_types,
+            'meta_query' => array(
+               array(
+                  'key' => $this->metadata_key,
+                  'value' => date('Ymd'),
+                  'compare' => '<',
+                  'type' => 'DATE'
+               )
+            )
+         );
+
+         $q = new WP_Query( $args );
+
+
+         if($q->have_posts() ) {
+            while ( $q->have_posts() ) {
+               $q->the_post();
+
+               $this->render_post();
+
+            }
+         }
+
+      }
+
+   }
 
 
 
 
 
-add_action('init', 'calendar_init');
-function calendar_init() {
+   add_action('init', 'calendar_init');
+   function calendar_init() {
 
-   setlocale(LC_TIME, "es_ES.UTF-8" );
+      setlocale(LC_TIME, "es_ES.UTF-8" );
 
-   $calendar = new KernKalender();
+      $calendar = new KernKalender();
 
+      $calendar -> add_post_type('date-cpt');
+      $calendar -> add_metadata_key('test-cpt-date');
 
+      $newFunc = function($calendar) {
 
-   $newFunc = function() {
+         global $post;
+         $ID = get_the_ID();
+         $date = get_post_meta( get_the_ID(), $calendar->metadata_key, true );
+         $link = get_the_permalink( $ID );
+         $title = get_the_title();
+         $image = get_the_post_thumbnail();
+         $excerpt = get_the_excerpt();
 
-      global $post;
-      $ID = get_the_ID();
-      $link = get_the_permalink( $ID );
-      $title = get_the_title();
-      $image = get_the_post_thumbnail();
-      $excerpt = get_the_excerpt();
+         ?>
 
-      ?>
+         <a href="<?php echo $link; ?>">
 
-      <a href="<?php echo $link; ?>">
+            <article>
 
-         <article>
+               <h1>
+                  <?php echo $title; ?>
+               </h1>
 
-            <h1>
-               <?php echo $title; ?>
-            </h1>
+               <small class="date">
+                  <?php echo $date; ?>
+               </small>
+               <div class="image">
+                  <?php echo $image; ?>
+               </div>
 
-            <div class="image">
-               <?php echo $image; ?>
-            </div>
+               <div class="excerpt">
+                  <?php echo $excerpt; ?>
+               </div>
 
-            <div class="excerpt">
-               <?php echo $excerpt; ?>
-            </div>
+            </article>
 
-         </article>
+         </a>
+         <?php
 
-      </a>
-      <?php
+      };
 
-   };
-
-   $calendar -> add_render_post_function( $newFunc );
-
-
-   add_shortcode( 'kalender', array( $calendar,'render_kalender'));
-
-   add_shortcode( 'kalender_posts', array( $calendar,'render_kalender_posts'));
-
-
-   add_filter('widget_text','do_shortcode');
-
-}
+      $calendar -> add_render_post_function( $newFunc );
 
 
-?>
+      add_shortcode( 'kalender', array( $calendar,'render_kalender'));
+
+      add_shortcode( 'kalender_posts', array( $calendar,'render_kalender_posts'));
+
+      add_shortcode( 'future_posts', array( $calendar, 'render_kalender_future_posts'));
+
+      add_shortcode( 'past_posts', array( $calendar, 'render_kalender_past_posts'));
+
+
+      add_filter('widget_text','do_shortcode');
+
+   }
+
+
+   ?>
