@@ -227,7 +227,7 @@ class KernKalender {
                         break;
 
                         case "day":
-                        $this->formatter->setPattern("EEEE d 'de' MMMM', 'yyyy");
+                        $this->formatter->setPattern("d 'de' MMMM");
                         echo $this->formatter->format( new DateTime( $year . '-' . $month . '-' . $day ) );
                         break;
 
