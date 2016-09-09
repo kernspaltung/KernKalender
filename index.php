@@ -584,6 +584,10 @@ class KernKalender {
                   )
                );
 
+               $args['orderby'] = 'meta_value';
+	            $args['meta_key'] = $this->metadata_key;
+	            $args['order'] = 'ASC';
+               
             } else {
                $args['date_query'] = $date_query;
             }
@@ -706,7 +710,7 @@ class KernKalender {
          $q = new WP_Query( $args );
 
          ob_start();
-         
+
          if($q->have_posts() ) {
             while ( $q->have_posts() ) {
                $q->the_post();
