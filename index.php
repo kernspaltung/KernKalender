@@ -204,7 +204,7 @@ class KernKalender {
       <section id="calendar " class="calendar w_100 h_100">
 
          <header>
-            
+
 
 
             <nav>
@@ -221,15 +221,14 @@ class KernKalender {
                      switch( $view ) {
 
                         case "month":
-                        $this->formatter->setPattern("EEEE d 'de' MMMM");
+                        $this->formatter->setPattern("MMMM");
                         echo $this->formatter->format( new DateTime( $year . '-' . $month . '-' . $day ) );
 
                         break;
 
                         case "day":
                         echo $day . " de ";
-                        echo strftime("%B",strtotime($month.'/'.$day.'/'.$year)) . ", ";
-                        echo $year;
+                        echo strftime("%B",strtotime($month.'/'.$day.'/'.$year));
                         break;
 
                      }
