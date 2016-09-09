@@ -222,13 +222,14 @@ class KernKalender {
 
                </div>
                <div class="three-quarters text-center">
-                  <h2>
+                  <h6>
                      <?php
                      switch( $view ) {
 
                         case "month":
-                        $this->formatter->setPattern("MMMM");
-                        echo $this->formatter->format( $this->date );
+                        $this->formatter->setPattern("EEEE d 'de' MMMM");
+                        echo $this->formatter->format( new DateTime( $year . '-' . $month . '-' . $day ) );
+
                         break;
 
                         case "day":
@@ -236,10 +237,11 @@ class KernKalender {
                         echo strftime("%B",strtotime($month.'/'.$day.'/'.$year)) . ", ";
                         echo $year;
                         break;
+
                      }
 
                      ?>
-                  </h2>
+                  </h6>
                </div>
                <div class="arrow arrow-next eight text-right">
 
@@ -587,7 +589,7 @@ class KernKalender {
                $args['orderby'] = 'meta_value';
 	            $args['meta_key'] = $this->metadata_key;
 	            $args['order'] = 'ASC';
-               
+
             } else {
                $args['date_query'] = $date_query;
             }
