@@ -204,13 +204,7 @@ class KernKalender {
       <section id="calendar " class="calendar w_100 h_100">
 
          <header>
-            <small>
-               <?php
-               $this->formatter->setPattern("EEEE d 'de' MMMM', 'yyyy");
-               echo $this->formatter->format( $this->today['date'] );
-               ?>
-            </small>
-
+            
 
 
             <nav>
