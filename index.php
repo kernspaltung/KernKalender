@@ -500,7 +500,18 @@ class KernKalender {
 
 
 
-      public function render_kalender_posts() {
+      public function render_kalender_posts($atts) {
+
+
+         $category = false;
+
+         if( is_array($atts) ) {
+
+            $category_name = $atts['category'];
+
+            $category = get_term_by('name', $category_name, 'category');
+
+         }
 
          $this -> load_query_vars();
 
@@ -587,6 +598,9 @@ class KernKalender {
                $args['date_query'] = $date_query;
             }
 
+            if( $category ) {
+               $args['cat'] = $category-> term_id ;
+            }
 
             $q = new WP_Query( $args );
 
@@ -625,6 +639,7 @@ class KernKalender {
       }
 
       public function default_render_post_function() {
+
          global $post;
          $ID = get_the_ID();
          $link = get_the_permalink( $ID );
@@ -657,7 +672,19 @@ class KernKalender {
       }
 
 
-      public function render_kalender_future_posts() {
+      public function render_kalender_future_posts($atts) {
+
+
+         $category = false;
+
+         if( is_array($atts) ) {
+
+            $category_name = $atts['category'];
+
+            $category = get_term_by('name', $category_name, 'category');
+
+         }
+
          $args = array(
             'posts_per_page' => -1,
             'post_type' => 'date-cpt',
@@ -670,6 +697,11 @@ class KernKalender {
                )
             )
          );
+
+
+         if( $category ) {
+            $args['cat'] = $category-> term_id ;
+         }
 
          $q = new WP_Query( $args );
          ob_start();
@@ -689,6 +721,18 @@ class KernKalender {
 
       public function render_kalender_past_posts() {
 
+
+
+         $category = false;
+
+         if( is_array($atts) ) {
+
+            $category_name = $atts['category'];
+
+            $category = get_term_by('name', $category_name, 'category');
+
+         }
+
          $args = array(
             'posts_per_page' => -1,
             'post_type' => $this->post_types,
@@ -701,6 +745,10 @@ class KernKalender {
                )
             )
          );
+
+         if( $category ) {
+            $args['cat'] = $category-> term_id ;
+         }
 
          $q = new WP_Query( $args );
 
