@@ -1,5 +1,10 @@
+
+
 $spacing: 15px;
 $color_accent: #fa0;
+$fontS: 11px;
+$fontM: 13px;
+$fontL: 18px;
 
 $font_small: 11px;
 
@@ -89,5 +94,113 @@ $font_small: 11px;
          left: 0;
          border: 1px solid black;
       }
+   }
+}
+
+
+
+
+
+
+// first theme
+
+$accent-color : #0bc1ed;
+
+.calendar {
+
+   nav, ul {
+      text-align: center;
+   }
+   .week-days > div {
+      width: 12% !important;
+
+   }
+   .day {
+      width: 14.4% !important;
+   }
+
+   .week-days > div, .day {
+      margin-bottom: 0.55vh;
+      margin-right: 0.55vh;
+   }
+   .week-days {
+      margin-bottom: $spacing*2;
+      font-size: $fontS;
+      text-align: left;
+
+   }
+
+   a {
+      color: black;
+      text-decoration: none !important;
+   }
+
+   .arrow {
+      a,span {
+         box-shadow: none !important;
+         text-decoration: none !important;
+      }
+   }
+   .day {
+      height: 6vh !important;
+
+
+      &.invisible {
+         opacity: 0 !important;
+      }
+      @media screen and (max-width:768px) {
+         height: 9vh !important;
+      }
+      // outline: 1px solid #fff !important;
+      background-color: #f4f3f0;
+      border: none !important;
+
+      transition: all 0.2s ease-in-out;
+      box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+      &:hover {
+        transform: scale(1.02);
+      }
+
+
+      &.full{
+         background-color: $accent-color !important;
+         transition: all 0.2s ease-in-out;
+         &:hover {
+            background-color: #000 !important;
+            a {
+               color:white !important;
+               .post-count {
+                  color: $accent-color !important;
+               }
+            }
+         }
+         a {
+            color:black !important;
+            .post-count {
+               color: white !important;
+            }
+         }
+      }
+
+
+
+      .day-number {
+         border:none !important;
+      }
+      .day-posts {
+         padding: 5px 0 0 0 !important;
+
+         .post-count {
+            font-size: $fontL;
+            text-align: right;
+
+         }
+
+      }
+   }
+
+
+   .calendar_date_title {
+      font-size: $fontM;
    }
 }

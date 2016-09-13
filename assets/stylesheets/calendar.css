@@ -53,4 +53,59 @@
     left: 0;
     border: 1px solid black; }
 
+.calendar nav, .calendar ul {
+  text-align: center; }
+.calendar .week-days > div {
+  width: 12% !important; }
+.calendar .day {
+  width: 14.4% !important; }
+.calendar .week-days > div, .calendar .day {
+  margin-bottom: 0.55vh;
+  margin-right: 0.55vh; }
+.calendar .week-days {
+  margin-bottom: 30px;
+  font-size: 11px;
+  text-align: left; }
+.calendar a {
+  color: black;
+  text-decoration: none !important; }
+.calendar .arrow a, .calendar .arrow span {
+  box-shadow: none !important;
+  text-decoration: none !important; }
+.calendar .day {
+  height: 6vh !important;
+  background-color: #f4f3f0;
+  border: none !important;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2); }
+  .calendar .day.invisible {
+    opacity: 0 !important; }
+  @media screen and (max-width: 768px) {
+    .calendar .day {
+      height: 9vh !important; } }
+  .calendar .day:hover {
+    transform: scale(1.02); }
+  .calendar .day.full {
+    background-color: #0bc1ed !important;
+    transition: all 0.2s ease-in-out; }
+    .calendar .day.full:hover {
+      background-color: #000 !important; }
+      .calendar .day.full:hover a {
+        color: white !important; }
+        .calendar .day.full:hover a .post-count {
+          color: #0bc1ed !important; }
+    .calendar .day.full a {
+      color: black !important; }
+      .calendar .day.full a .post-count {
+        color: white !important; }
+  .calendar .day .day-number {
+    border: none !important; }
+  .calendar .day .day-posts {
+    padding: 5px 0 0 0 !important; }
+    .calendar .day .day-posts .post-count {
+      font-size: 18px;
+      text-align: right; }
+.calendar .calendar_date_title {
+  font-size: 13px; }
+
 /*# sourceMappingURL=calendar.css.map */

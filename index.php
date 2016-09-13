@@ -66,6 +66,8 @@ class KernKalender {
 
    public static function load_assets() {
 
+      wp_enqueue_style( "font-awesome", plugin_dir_url( __FILE__ ) . "/bower_components/font-awesome/css/font-awesome.css" );
+
       wp_enqueue_style( "calendar", plugin_dir_url( __FILE__ ) . "/assets/stylesheets/calendar.css" );
 
       wp_enqueue_script( "jquery", plugin_dir_url( __FILE__ ) . "/bower_components/jquery/dist/jquery.min.js" );
@@ -211,12 +213,12 @@ class KernKalender {
                <div class="arrow arrow-previous eight text-left">
 
                   <a href="<?php echo $this->arrow_link("previous",$view,$month,$year,$day); ?>">
-                     previous
+                     <span class="fa fa-arrow-left"></span>
                   </a>
 
                </div>
                <div class="three-quarters text-center">
-                  <h6>
+                  <h6 class="calendar_date_title">
                      <?php
                      switch( $view ) {
 
@@ -239,7 +241,7 @@ class KernKalender {
                <div class="arrow arrow-next eight text-right">
 
                   <a href="<?php echo $this->arrow_link("next",$view,$month,$year,$day); ?>">
-                     next
+                     <span class="fa fa-arrow-right"></span>
                   </a>
                </div>
             </nav>
@@ -351,11 +353,11 @@ class KernKalender {
                         if( $q->post_count > 0 ) {
 
                            ?>
-                           (
+
                            <span class="post-count">
                               <?php echo $q->post_count; ?>
                            </span>
-                           )
+
                            <?php
                         }
                         ?>
