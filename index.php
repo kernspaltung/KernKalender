@@ -513,7 +513,7 @@ class KernKalender {
                   if( $atts["category"] && strcmp("",$atts["category"]) ) {
                      $category_name = $atts["category"];
                      $cat_obj = get_term_by('name', $category_name, "category" );
-                     array_push( $categories, $cat_obj->ID );
+                     array_push( $categories, $cat_obj->term_id );
                   }
                }
             }
