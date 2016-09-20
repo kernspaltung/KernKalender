@@ -5,6 +5,7 @@ Author: kernspaltung!
 Description: Flexible KernKalender for WordPress developers. Features API and with automatic view rendering and shortcodes for dummies
 */
 
+
 class KernKalender {
 
    var
@@ -187,9 +188,14 @@ class KernKalender {
             if( array_key_exists('year', $args) ) {
                $year = $args['year'];
             }
+            if( array_key_exists('categories', $args) ) {
+               $categories = $args['categories'];
+            }
 
 
          }
+
+
 
       } else {
 
@@ -197,8 +203,11 @@ class KernKalender {
          $day = $this->today['day'];
          $month = $this->today['month'];
          $year = $this->today['year'];
+         $categories = NULL;
 
       }
+
+
 
       ?>
 
@@ -260,7 +269,7 @@ class KernKalender {
             //       $this->render_month_view($day,$month,$year);
             //       break;
             // }
-            $this->render_month_view($day,$month,$year);
+            $this->render_month_view($day,$month,$year,$categories);
 
             ?>
 
@@ -269,7 +278,7 @@ class KernKalender {
          <?php
       }
 
-      public function render_month_view($d,$m,$y) {
+      public function render_month_view($d,$m,$y,$categories) {
 
          $week_day_initials = ["l", "m", "m", "j", "v", "s", "d" ];
 
@@ -319,7 +328,7 @@ class KernKalender {
                      'year'   => $y,
                   ),
                );
-               $q = $this->get_date_posts_query( $date_query, $this->post_types );
+               $q = $this->get_date_posts_query( $date_query, $this->post_types, $categories );
 
                $full = $q->post_count > 0;
 
@@ -345,26 +354,29 @@ class KernKalender {
 
 
                ?>
-               <div class="day button enabled <?php echo $current ? "current" : ""; ?> <?php #  echo $i==$d ? ' today ' : ''; ?> <?php echo $full ? 'full' : 'empty'; ?>" data-posts="<?php echo json_encode($post_ids); ?>">
-                  <?php echo $full ? '<a href="'.$link.'">' : ''; ?>
-                     <sup class="day-number">
-                        <?php echo $i; ?>
-                     </sup>
-                     <div class="day-posts">
-                        <?php
-                        if( $q->post_count > 0 ) {
+               <div class="day enabled <?php echo $current ? "current" : ""; ?> <?php #  echo $i==$d ? ' today ' : ''; ?> <?php echo $full ? 'full' : 'empty'; ?>" data-posts="<?php echo json_encode($post_ids); ?>">
+                  <div class="container">
 
-                           ?>
-
-                           <span class="post-count">
-                              <?php echo $q->post_count; ?>
-                           </span>
-
+                     <?php echo $full ? '<a href="'.$link.'">' : ''; ?>
+                        <sup class="day-number">
+                           <?php echo $i; ?>
+                        </sup>
+                        <div class="day-posts">
                            <?php
-                        }
-                        ?>
-                     </div>
-                     <?php echo $full ? '</a>' : ''; ?>
+                           if( $q->post_count > 0 ) {
+
+                              ?>
+
+                              <span class="post-count">
+                                 <?php echo $q->post_count; ?>
+                              </span>
+
+                              <?php
+                           }
+                           ?>
+                        </div>
+                        <?php echo $full ? '</a>' : ''; ?>
+                     </div> <!-- .container -->
                   </div>
                   <?php
                }
@@ -385,7 +397,8 @@ class KernKalender {
 
          }
 
-         public function get_date_posts_query( $date_query, $post_types=0, $num=-1 ) {
+         public function get_date_posts_query( $date_query, $post_types=0, $num=-1, $categories = NULL ) {
+
             if( ! $post_types ) {
                $post_types = $this->post_types;
             }
@@ -418,6 +431,14 @@ class KernKalender {
 
             }
 
+
+
+            if( is_array( $categories ) ) {
+               if( count( $categories ) > 0) {
+                  $args['category__in'] = $categories;
+               }
+            }
+
             $query = new WP_Query( $args );
 
             return $query;
@@ -439,7 +460,7 @@ class KernKalender {
 
                if( $d == "" && $m != "" && $y != "" ) {
 
-                  $this->day     = 1;
+                  $this->day     = 0;
                   $this->month   = $m;
                   $this->year    = $y;
 
@@ -482,16 +503,34 @@ class KernKalender {
       }
 
 
-      public function render_kalender() {
+      public function render_kalender( $atts ) {
 
+         $categories = array();
+
+         if( $atts ) {
+            if( is_array( $atts ) ) {
+               if( array_key_exists( "category", $atts ) ) {
+                  if( $atts["category"] && strcmp("",$atts["category"]) ) {
+                     $category_name = $atts["category"];
+                     $cat_obj = get_term_by('name', $category_name, "category" );
+                     array_push( $categories, $cat_obj->ID );
+                  }
+               }
+            }
+         }
          $this -> load_query_vars();
 
          $args = array(
             'view' => $this->view,
             'day' => $this->day,
             'month' => $this->month,
-            'year' => $this->year
+            'year' => $this->year,
          );
+
+         if( count( $categories ) > 0 ) {
+            $args['categories'] = $categories;
+         }
+
          ob_start();
 
          $this -> load_date( $args );
@@ -595,8 +634,8 @@ class KernKalender {
                );
 
                $args['orderby'] = 'meta_value';
-	            $args['meta_key'] = $this->metadata_key;
-	            $args['order'] = 'ASC';
+               $args['meta_key'] = $this->metadata_key;
+               $args['order'] = 'ASC';
 
             } else {
                $args['date_query'] = $date_query;
@@ -782,14 +821,14 @@ class KernKalender {
    function calendar_init() {
 
       setlocale(LC_TIME, "es_ES.UTF-8" );
-
+      global $calendar;
       $calendar = new KernKalender();
 
       $calendar -> set_view('month');
 
-      $calendar -> add_post_type('date-cpt');
+      $calendar -> add_post_type('concierto');
 
-      $calendar -> add_metadata_key('test-cpt-date');
+      $calendar -> add_metadata_key('fecha');
 
       $newFunc = function($calendar) {
 
