@@ -325,6 +325,8 @@ class KernKalender {
 
                // $full = 1;//$q->post_count > 0;
 
+               $current = $this->day == $i ? 1 : 0;
+
                if ( $full ) {
 
                   $params = array();
@@ -343,7 +345,7 @@ class KernKalender {
 
 
                ?>
-               <div class="day button enabled <?php #  echo $i==$d ? ' today ' : ''; ?> <?php echo $full ? 'full' : 'empty'; ?>" data-posts="<?php echo json_encode($post_ids); ?>">
+               <div class="day button enabled <?php echo $current ? "current" : ""; ?> <?php #  echo $i==$d ? ' today ' : ''; ?> <?php echo $full ? 'full' : 'empty'; ?>" data-posts="<?php echo json_encode($post_ids); ?>">
                   <?php echo $full ? '<a href="'.$link.'">' : ''; ?>
                      <sup class="day-number">
                         <?php echo $i; ?>

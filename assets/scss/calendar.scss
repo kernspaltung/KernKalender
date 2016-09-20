@@ -1,9 +1,9 @@
-
-
 $spacing: 15px;
-$color_accent: #fa0;
-$fontS: 11px;
-$fontM: 13px;
+$accent-color : #0bc1ed;
+$accent-color2: #25e5ff;
+
+$fontS: 12px;
+$fontM: 14px;
 $fontL: 18px;
 
 $font_small: 11px;
@@ -19,11 +19,16 @@ $font_small: 11px;
 .d-i-b {
    display: inline-block;
 }
+$seventh: calc( 100% / 7 ) !important;
 .seventh {
    @extend .f-l;
    @extend .d-i-b;
-   width: calc(100% / 7);
+
+   width: $seventh;
+   box-sizing: border-box !important;
+   margin: 0 !important;
 }
+
 .quarter {
    @extend .f-l;
    @extend .d-i-b;
@@ -59,42 +64,61 @@ $font_small: 11px;
 }
 
 
-.calendar-view {
+.calendar {
 
-   .day,.weekday-header {
-      @extend .seventh;
+   height: auto;
+
+   .calendar-view {
+      * {
+      }
+
+      .day,.weekday-header {
+         @extend .seventh;
+      }
+
+      .weekday-header, .day {
+         padding: $spacing;
+      }
+      .day {
+         border:1px solid #ccc;
+         padding:2px;
+         text-align:center;
+         font-size:14px;
+
+         height: 50px;
+
+         position: relative;
+
+         &.full {
+            cursor: pointer;
+            .container{ background-color: $accent_color; }
+         }
+         &.current {
+            .container{ background-color: $accent_color2 !important; }
+         }
+         &.today {
+            .container{ background-color: $accent_color2; }
+            color: #fff;
+         }
+         &.invisible {
+            border: none;
+         }
+         .day-number {
+            padding: $spacing / 2 !important;
+            text-align: left;
+            position: absolute;
+            top: 0;
+            left: 0;
+            border: 1px solid black;
+         }
+
+         .day-posts {
+            padding-top: $spacing !important;
+            text-align: center;
+         }
+      }
    }
 
-   .weekday-header, .day {
-      padding: $spacing;
-   }
-   .day {
-      border:1px solid #ccc;
-      padding:5px; text-align:center; font-size:14px;
-
-      height: 50px;
-
-      position: relative;
-      &.today {
-         background-color: #222;
-         color: #fff;
-      }
-      &.full {
-         cursor: pointer;
-         background-color: $color_accent;
-      }
-      &.invisible {
-         border: none;
-      }
-      .day-number {
-         padding: $spacing / 2 !important;
-         text-align: left;
-         position: absolute;
-         top: 0;
-         left: 0;
-         border: 1px solid black;
-      }
-   }
 }
 
 
@@ -104,7 +128,6 @@ $font_small: 11px;
 
 // first theme
 
-$accent-color : #0bc1ed;
 
 .calendar {
 
@@ -115,9 +138,7 @@ $accent-color : #0bc1ed;
       width: 12% !important;
 
    }
-   .day {
-      width: 14.4% !important;
-   }
+
 
    .week-days > div, .day {
       margin-bottom: 0.55vh;
@@ -141,8 +162,21 @@ $accent-color : #0bc1ed;
          text-decoration: none !important;
       }
    }
+
    .day {
-      height: 6vh !important;
+
+      height: 8vh !important;
+
+      background-color: transparent;
+
+      .container {
+
+         width: 100%;
+         height: 100%;
+         background-color: #f4f3f0;
+         box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+
+      }
 
 
       &.invisible {
@@ -152,32 +186,37 @@ $accent-color : #0bc1ed;
          height: 9vh !important;
       }
       // outline: 1px solid #fff !important;
-      background-color: #f4f3f0;
       border: none !important;
 
       transition: all 0.2s ease-in-out;
-      box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+
       &:hover {
         transform: scale(1.02);
       }
 
 
       &.full{
-         background-color: $accent-color !important;
+
          transition: all 0.2s ease-in-out;
+
+         .container {
+            background-color: $accent-color !important;
+         }
+
          &:hover {
-            background-color: #000 !important;
-            a {
+            .container {
+               background-color: #000 !important;
                color:white !important;
-               .post-count {
-                  color: $accent-color !important;
-               }
+            }
+            a {
+               color: $accent-color !important;
             }
          }
          a {
             color:black !important;
             .post-count {
                color: white !important;
+               font-weight: bold;
             }
          }
       }
@@ -191,9 +230,8 @@ $accent-color : #0bc1ed;
          padding: 5px 0 0 0 !important;
 
          .post-count {
-            font-size: $fontL;
+            font-size: $fontS;
             text-align: right;
-
          }
 
       }
