@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Calendario Festify
+Plugin Name: KernKalender
 Author: kernspaltung!
 Description: Flexible KernKalender for WordPress developers. Features API and with automatic view rendering and shortcodes for dummies
 */
@@ -43,6 +43,9 @@ class KernKalender {
       $this->post_types = array();
 
       add_action("wp_enqueue_scripts", array( $this, "load_assets") );
+
+      add_action("admin_enqueue_scripts", array( $this, "load_assets") );
+
       date_default_timezone_set('America/Mexico_City');
 
       function add_query_vars_filter( $vars ){
@@ -72,6 +75,7 @@ class KernKalender {
 
       wp_enqueue_style( "font-awesome", plugin_dir_url( __FILE__ ) . "/bower_components/font-awesome/css/font-awesome.css" );
 
+      wp_enqueue_style( "jquery-ui-datepicker-css", plugin_dir_url( __FILE__ ) . "/bower_components/jqueryui-datepicker/datepicker.css");
       wp_enqueue_style( "calendar", plugin_dir_url( __FILE__ ) . "/assets/stylesheets/calendar.css" );
 
       wp_enqueue_script( "jquery", plugin_dir_url( __FILE__ ) . "/bower_components/jquery/dist/jquery.min.js" );

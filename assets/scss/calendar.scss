@@ -1,6 +1,6 @@
 $spacing: 15px;
-$accent-color : #0bc1ed;
-$accent-color2: #25e5ff;
+$accent-color : #E78419;
+$accent-color2: #f7a439;
 
 $fontS: 12px;
 $fontM: 14px;
@@ -85,7 +85,7 @@ $seventh: calc( 100% / 7 ) !important;
          text-align:center;
          font-size:14px;
 
-         height: 50px;
+         height: 100;
 
          position: relative;
 
@@ -135,7 +135,7 @@ $seventh: calc( 100% / 7 ) !important;
       text-align: center;
    }
    .week-days > div {
-      width: 12% !important;
+      width: 14% !important;
 
    }
 
@@ -165,7 +165,7 @@ $seventh: calc( 100% / 7 ) !important;
 
    .day {
 
-      height: 8vh !important;
+      height: 5vh !important;
 
       background-color: transparent;
 
